@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>phonegap</title>   
+    <script type="text/javascript" src="../js/jquery-1.11.3.js"></script>
+    <script type="text/javascript" src="../js/cordova.js"></script>
+    <style type="text/css">
+    	
+    </style>
+    <script type="text/javascript" charset="utf-8">   	
+      	$(function(){
+ 			
+			//TODO:设备加载完成事件
+			document.addEventListener('deviceready',myDeviceReady,false);
+			
+		});
+      	
+      	//TODO:设备加载完毕
+      	function myDeviceReady(){
+      		
+      		//设备置为后台
+      		document.addEventListener('pause',myPause,false);
+      		
+      		
+      	
+      		document.addEventListener('resume',myResume,false);
+		
+			document.addEventListener('online',myOnline,false);
+			document.addEventListener('offline',myOffline,false);
+			
+			document.addEventListener('backbutton',myBackbutton,false);
+			document.addEventListener('menubutton',myMenubutton,false);
+			
+			//电池电量状态
+      		window.addEventListener('batterystatus',myBatterystatusListener,false);
+			
+			//电量低于20%时候触发
+			window.addEventListener('batterycritical',myBatterycritical,false);
+			
+			//电量低触发
+			window.addEventListener('batterylow',myBatterylow,false);
+      	
+      	}
+      	
+      	//TODO:应用被置为前台
+      	function myPause(){
+      		alert("应用被置为前台");
+      	}      	
+      	//电量状态
+		function myBatterystatusListener(info){
+			$("#batterystatus").text("电量值" + info.level+info.isPlugged);
+		}		
+		//应用被置为前台
+		function myResume(){
+			console.log('应用被置为前台');
+		}
+		//连接网络的时候执行的事件
+		function myOnline(){
+			console.log('连接网络的时候执行的事件');
+		}
+		//断开网络执行的事件
+		function myOffline(){
+			console.log('断开网络执行的事件');			
+		}
+		var backcount=0;
+		var menucount=0;
+		//点击返回按钮的事件
+		function myBackbutton(){
+			console.log('返回按钮被点击了');
+			backcount++;			
+		}
+		//菜单按钮
+		function myMenubutton(){
+			console.log('菜单按钮被点击了');
+			menucount++;
+			
+		}		
+		//电量低于20%的时候触发
+		function myBatterycritical(info){
+			console.log("电量低于20%的时候触发" + info.level);		
+		}
+		//电量低于5%的时候触发
+		function myBatterylow(info){
+			console.log("电量低于5%的时候触发" + info.level);		
+		}
+    </script>
+</head>
+<body>
+	
+	
+	<div id="batterystatus">
+	</div>
+	
+</body>
+</html>

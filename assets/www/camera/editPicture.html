@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+    <meta name="viewport" 
+    	content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>phonegap照相机</title> 
+    <link type="text/css" rel="stylesheet" href="cropper.css" />   
+    <script type="text/javascript" src="../js/jquery-1.11.3.js"></script>
+   	<script type="text/javascript" src="../cordova.js"></script>
+    <script type="text/javascript" src="cropper.js"></script>     
+</head> 
+
+<body>
+	
+	<form action="">
+		<input type="text">
+	</form>
+	
+	<!--  -->
+	<button id="btnChoiceImg">选择图片</button>
+	<div class="container">
+	    <h1>Crop a round image</h1>
+	    
+	    <h3>Image</h3>
+		<div>
+	    	<img id="image" src="../img/icon.png" alt="Picture">
+	    </div>
+	    
+	    <h3>Result</h3>
+	    <button type="button" id="btnCrop">剪裁</button>
+	    <div id="result"></div>
+	    
+	</div>
+
+	<script type="text/javascript">
+   		function getRoundedCanvas(sourceCanvas) {
+      		var canvas = document.createElement('canvas');
+      		var context = canvas.getContext('2d');
+      		var width = sourceCanvas.width;
+      		var height = sourceCanvas.height;
+
+      		canvas.width = width;
+      		canvas.height = height;
+      		context.beginPath();
+      		context.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, 2 * Math.PI);
+      		context.strokeStyle = 'rgba(0,0,0,0)';
+      		context.stroke();
+      		context.clip();
+      		context.drawImage(sourceCanvas, 0, 0, width, height);
+
+      		return canvas;
+    	}
+
+    	$(function () {
+			
+			var $image = $('#image');
+			var btnCrop = $('#btnCrop');
+			var $result = $('#result');
+			var croppable = false;
+
+	        $image.cropper({
+	       		aspectRatio: 1,
+	        	viewMode: 1,
+	        	ready: function () {
+	          	croppable = true;
+	        	}
+			});
+
+      		btnCrop.on('click', function () {
+		        var croppedCanvas;
+		        var roundedCanvas;
+	
+		        if (!croppable) {
+		          return;
+		        }
+	
+		        // Crop
+		        croppedCanvas = $image.cropper('getCroppedCanvas');
+		
+		        // Round
+		        roundedCanvas = getRoundedCanvas(croppedCanvas);
+		
+		
+				//alert(roundedCanvas.toDataURL());
+				
+				//构造formData
+				//var form=document.forms[0];
+    			//var formData = new FormData(form);
+				//如果用上面这张方式构造formData,则会连同forms[0]的其他数据一起提交
+				
+				//也有人直接将base64字符串提交
+				
+				var formData = new FormData();
+				formData.append("imageName",convertBase64UrlToBlob(roundedCanvas.toDataURL())); 
+				
+				$.ajax({
+					url : "不存在的请求地址",
+			        type : "POST",
+			        data : formData,
+			        dataType:"text",
+			        processData : false,         // 告诉jQuery不要去处理发送的数据
+			        contentType : false,        // 告诉jQuery不要去设置Content-Type请求头
+			        
+			        success:function(data){
+			           	//成功后回调地址
+			        },
+			        xhr:function(){            //在jquery函数中直接使用ajax的XMLHttpRequest对象
+			            var xhr = new XMLHttpRequest();
+			            
+			            xhr.upload.addEventListener("progress", function(evt){
+			                if (evt.lengthComputable) {
+			                    var percentComplete = Math.round(evt.loaded * 100 / evt.total);  
+			                    console.log("正在提交."+percentComplete.toString() + '%');        //在控制台打印上传进度
+			                }
+			            }, false);
+			            
+			            return xhr;
+			        }
+				});
+		
+		        //TODO:预览一次
+		        $result.html('<img src="' + roundedCanvas.toDataURL() + '">');	        
+	      	});
+	      	
+	      	//TODO:选择图片
+	      	$("#btnChoiceImg").click(function(){
+	      		//$image.cropper('replace', "../img/index.png");
+	      		//$image.attr("src","../img/index.png");
+	      		
+	      		navigator.camera.getPicture(onSuccess, onError, { 
+	 				quality: 70,
+				    destinationType: Camera.DestinationType.DATA_URL,   //以文件地址返回url
+				    sourceType:Camera.PictureSourceType.Camera,       //摄像机获取
+				   	//sourceType:Camera.PictureSourceType.PHOTOLIBRARY,
+				    targetWidth:200,
+				    targetHeight:200
+				});			
+	      		
+	      		
+	      		function onSuccess(imageURI){
+		   	    	//$("#imgArea").show();    
+		   	    	//alert(imageURI);
+			    	//$('#img').attr("src","data:image/jpeg;base64," + imageURI);
+			    	
+			    	alert(imageURI);
+			    	$image.cropper('replace', "data:image/jpeg;base64," + imageURI);
+		   	    }
+		   	    function onError(message){
+		   	    	alert("错误是："+message);
+		   	    }
+	      		
+	      	});
+    	});
+    	
+    	
+    	function convertBase64UrlToBlob(urlData){
+    
+		    var bytes=window.atob(urlData.split(',')[1]);        //去掉url的头，并转换为byte
+		    
+		    //处理异常,将ascii码小于0的转换为大于0
+		    var ab = new ArrayBuffer(bytes.length);
+		    var ia = new Uint8Array(ab);
+		    for (var i = 0; i < bytes.length; i++) {
+		        ia[i] = bytes.charCodeAt(i);
+		    }
+		
+		    return new Blob( [ab] , {type : 'image/png'});
+		}
+    </script>
+     
+</body>
+</html>

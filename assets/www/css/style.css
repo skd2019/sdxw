@@ -1,0 +1,19 @@
+@charset "utf-8";
+*{margin: 0px;padding: 0px;}
+
+
+ul,li{list-style: none;}
+html{font-size: 100px;}
+html,body{width: 100%;height: 100%;}
+
+
+#footer-icon{height: 20px;}
+#footer-icon li{float:left; width: 24%;height: 20px;}
+#footer-icon .index{background: url(../img/index-active.png) no-repeat 50% 5px;background-size: 20%;}
+#footer-icon .service{background: url(../img/service-active.png) no-repeat 50% 5px;background-size: 20%;}
+#footer-icon .baoliao{background: url(../img/baoliao-active.png) no-repeat 50% 5px;background-size: 20%;}
+#footer-icon .circle{background: url(../img/circle-active.png) no-repeat 50% 7px;background-size: 20%;}
+
+#footer-link{height: 20px;}
+#footer-link li{float:left; width: 24%;height: 20px;text-align: center;font-size: 12px;margin-top: 2px;color: #555555;}
+

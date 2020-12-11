@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" 
+    	content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>苏电新闻</title>
+    <link href="css/style.css" rel="stylesheet"/>
+    <link href="css/mui.min.css" rel="stylesheet"/>  
+    <script src="js/mui.min.js"></script>
+    <script type="text/javascript" src="js/jquery-1.11.3.js"></script>
+    <style type="text/css">
+    	/*默认设计没有页脚，苏电新闻使用了页脚，所以这里必须设置*/
+    	div#pullrefreshContainer{
+    		margin-bottom: 45px;
+    	}
+    </style>
+    <script type="text/javascript" charset="utf-8">  
+    	//TODO:设置ajax总页数
+		var totalPage = 5;
+		var pageIndex = 1;
+		var pageSize = 10;
+
+      	//TODO:初始化mui配置
+		mui.init({
+			gestureConfig: {
+				doubletap: true
+			},
+			pullRefresh: {
+				container: '#pullrefreshContainer',
+				/*
+				down: {
+					contentrefresh:"正在加载...",
+					callback: pulldownRefresh
+				},
+				*/
+				up: {
+					contentrefresh: '正在加载...',
+					callback: pullupRefresh
+				}
+			}
+		});
+		
+		//TODO:下拉:这个暂时没有用到
+		function pulldownRefresh() {
+			setTimeout(function() {
+				var table = document.body.querySelector('.mui-table-view');
+				var cells = document.body.querySelectorAll('.mui-table-view-cell');
+				//模拟数据：实际要换成ajax请求
+				for(var i = cells.length, len = i + 3; i < len; i++) {
+					var li = document.createElement('li');
+					li.className = 'mui-table-view-cell';
+					li.setAttribute("data-id", i);
+						table.insertBefore(li, table.firstChild);
+					}
+					mui('#pullrefreshContainer').pullRefresh().endPulldownToRefresh(); //refresh completed
+			}, 1500);
+		}
+
+		//TODO:上拉，请求更多的数据
+		function pullupRefresh() {				
+			setTimeout(function() {			
+				mui.ajax({  //TODO:发送请求并且获取数据
+					url: "data/newsList.json",
+					data: {
+						page: pageIndex,
+						size: pageSize
+					},
+					dataType: 'json', //服务器返回json格式数据
+					type: 'get', //HTTP请求类型
+					timeout: 10000, //超时时间设置为10秒；
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					success: function(da) {
+						
+						//TODO:设置totalPage
+						totalPage = da.total;
+						mui('#pullrefreshContainer').pullRefresh().endPullupToRefresh((++pageIndex > 5));    //参数为true代表没有更多数据了,与下拉不同这个要先执行。
+						
+						//TODO:下面将dom操作转换为jquery的dom操作
+						for(var i=0;i<pageSize;i++){
+							//$("<li class='mui-table-view-cell'><a>我是节点操作"+i+1+"</a></li>").appendTo($(".mui-table-view"));
+							$('<li class="mui-table-view-cell mui-media" data-id='+eval(i+1)+'>'+
+						    '<a href="javascript:;">'+
+						      	'<img class="mui-media-object mui-pull-left" src="img/'+da.rows[i].img+'" width="50" height="50">'+
+						      	'<div class="mui-media-body">'+
+						          	'<span>'+da.rows[i].title+'</span>'+
+						        	'<p class="mui-ellipsis" style="margin-top: 5px;">'+
+						        		'<img src="img/praise.png" width="20" height="15" style="margin-top: 3px; float: left;"></img>'+
+						        		'<span style="margin-left: 20px;display: inline-block;"><span style="color: red;">5</span>人</span>'+
+						        		'<span style="margin-right: 0px;display: inline-block;float: right;">2017-04-17</span>'+
+						        	'</p>'+
+						      '</div>'+
+						    '</a>').appendTo($(".mui-table-view"))				
+						}
+					}
+				});		
+			}, 1500);
+		}
+		
+		//TODO：第一次默认加载,以下行为无法再浏览器端调试
+		if(mui.os.plus) {
+			mui.plusReady(function() {
+				setTimeout(function() {
+					mui('#pullrefreshContainer').pullRefresh().pullupLoading(); //手动加载一次
+				}, 1000);
+
+			});
+		} else {
+			mui.ready(function() {
+				mui('#pullrefreshContainer').pullRefresh().pullupLoading();
+			});
+		}
+  	
+      	//window.onload
+      	$(function(){
+      		
+      		//TODO:这里的选择器可以使用jquery
+			var contentWebview = null;
+			document.querySelector('#header').addEventListener('doubletap', function() {
+				mui('#pullrefreshContainer').pullRefresh().scrollTo(0, 0, 100)
+			});
+			
+			
+			//TODO:跳转到详情页面
+			var detailPage = null;
+			mui(".mui-table-view").on('tap', '.mui-table-view-cell', function() {				
+				//获取新闻id
+				var id = this.getAttribute("data-id");					
+				//获得详情页面:plus在浏览器端无法调试
+				if(!detailPage) {
+					detailPage = plus.webview.getWebviewById('newsDetail.html');
+				}	
+				//打开新闻详情并且传递值
+				mui.openWindow({
+					id: id,
+					url: 'newsDetail.html',
+					extras: {
+						extPatam:"sky"
+					}
+				});
+			});
+
+
+			//end of window onload
+      	});
+      	
+      	alert(1);
+      	
+    </script>
+</head>
+<body>
+	<!--头部-->
+	<div class="mui-bar mui-bar-nav" id="header">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">苏电新闻!!!!!!</h1>
+	</div>
+	
+	<!--内容区域和下拉刷新容器-->
+	<div class="mui-content mui-scroll-wrapper" id="pullrefreshContainer" >
+		<div class="mui-scroll">
+		    <!--数据列表-->
+		    <ul class="mui-table-view mui-table-view-chevron">
+		    	<!--<li class="mui-table-view-cell mui-media">
+				    <a href="javascript:;">
+				      	<img class="mui-media-object mui-pull-left" src="img/icon.png" width="50" height="50">
+				      	<div class="mui-media-body">
+				          	<span>新闻标题</span>
+				        	<p class='mui-ellipsis' style="margin-top: 5px;">
+				        		<img src="img/praise.png" width="20" height="15" style="margin-top: 3px; float: left;"></img>
+				        		<span style="margin-left: 20px;display: inline-block;"><span style="color: red;">5</span>人</span>
+				        		<span style="margin-left: 60px;display: inline-block;">2017-04-17</span>
+				        	</p>
+				      </div>
+				    </a>
+				</li>-->
+		    </ul>
+	  	</div>
+	</div>
+
+	<!--页脚-->
+	<div class="mui-bar mui-bar-footer" >
+		<ul id="footer-icon">
+			<li class="index"></li>			
+			<li class="service"></li>
+			<li class="baoliao"></li>
+			<li class="circle"></li>		
+		</ul>
+		<ul id="footer-link">
+			<li><a>首页</a></li>
+			<li><a>服务</a></li>
+			<li><a>爆料</a></li>	
+			<li><a>我的</a></li>	
+		</ul>	
+	</div>
+
+</body>
+</html>

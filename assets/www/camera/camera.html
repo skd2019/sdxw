@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" 
+    	content="text/html;charset=UTF-8">
+    <meta name="viewport" 
+    	content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <title>phonegap照相机</title>   
+    <script type="text/javascript" src="../js/jquery-1.11.3.js"></script>
+    <script type="text/javascript" src="../cordova.js"></script>   
+
+    
+</head> 
+
+<body>
+	
+	<h1>PhoneGap100实战</h1>
+	
+	<div>
+		<button id="btn">拍照</button>
+	</div>
+	
+	<div id="imgArea" style="display:none" >
+		<img id="img" src="" alt="" />
+	</div>
+	
+</body>
+<script type="text/javascript" charset="utf-8">   		
+	$(function(){	
+		 // 等待PhoneGap加载
+	    document.addEventListener("deviceready", onDeviceReady, false);		
+		
+		//phonegap具体api	
+	    //http://www.phonegap100.com/doc/cordova_camera_camera.md.html
+
+	});
+
+    // 加载完成
+    function onDeviceReady() {
+    	$("#btn").click(function(){
+			//alert("ss");return;
+			navigator.camera.getPicture(onSuccess, onError, { 
+ 				quality: 70,
+			    destinationType: Camera.DestinationType.DATA_URL,   //以文件地址返回url
+			    sourceType:Camera.PictureSourceType.Camera,       //摄像机获取
+			   	//sourceType:Camera.PictureSourceType.PHOTOLIBRARY,
+			    targetWidth:200,
+			    targetHeight:200
+			});			
+		});        
+    }
+	    
+	function onSuccess(imageURI){
+		$("#imgArea").show();    
+	    alert(imageURI);
+    	$('#img').attr("src","data:image/jpeg;base64," + imageURI);
+	}
+	function onError(message){
+		alert("错误是："+message);
+	}
+</script>
+</html>
