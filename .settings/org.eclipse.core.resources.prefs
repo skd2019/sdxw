@@ -1,6 +1,7 @@
 eclipse.preferences.version=1
-encoding//assets/www/camera/camera.html=UTF-8
-encoding//assets/www/camera/editPicture.html=UTF-8
+encoding//assets/www/detail.html=UTF-8
 encoding//assets/www/evts/evt.html=UTF-8
 encoding//assets/www/index.html=UTF-8
-encoding//assets/www/position/getPosition.html=UTF-8
+encoding//assets/www/phonegaps/connect.html=UTF-8
+encoding//assets/www/phonegaps/device.html=UTF-8
+encoding//assets/www/phonegaps/position/getPosition.html=UTF-8

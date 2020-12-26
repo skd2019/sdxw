@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>苏电新闻</title>	
+	<link rel="stylesheet" type="text/css" href="css/style.css" />
+	<link rel="stylesheet" type="text/css" href="css/mui.min.css" />
+	<script type="text/javascript" src="js/jquery-3.5.1.js"></script>
+	<script src="js/mui.min.js"></script>
+	<style type="text/css">
+		div.mui-content{  
+    		padding-bottom: 45px;
+    	}
+		h4#title{
+			padding:10px; text-align: center;
+		}
+		div#releaseDate{
+			margin: 5px; text-align: right; color: orange;
+		}
+		div#newsContent{
+			margin: 5px;  color: #333; line-height: 24px; text-indent: 24px;
+		}
+	</style>
+</head>
+<body>
+	
+	<div class="mui-bar mui-bar-nav" id="header">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 class="mui-title">苏电新闻</h1>
+	</div>
+	
+	
+	<div class="mui-content" >
+		<h4  id="title"></h3>
+					
+		<div id="releaseDate"></div>
+		<img id='imgs' alt="">
+
+		</img>
+		<div id="newsContent"></div>
+	</div>
+
+	
+	<div class="mui-bar mui-bar-footer" >
+		<ul id="footer-icon">
+			<li class="index"></li>			
+			<li class="service"></li>
+			<li class="baoliao"></li>
+			<li class="circle"></li>		
+		</ul>
+		<ul id="footer-link">
+			<li><a>首页</a></li>
+			<li><a>服务</a></li>
+			<li><a>爆料</a></li>	
+			<li><a>我的</a></li>	
+		</ul>	
+	</div>
+
+	
+</body>
+<script type="text/javascript">
+	//不解释啦		
+	mui.init();	
+	$.get("data/detail.json").done(function(da){
+	 	if(da){
+	 		$("#title").html(da.title);
+	 		$("#releaseDate").html(da.releaseDate);
+	 		$("#imgs").prop("src",da.imgs.split(",")[0]);
+	 		$("#newsContent").html(da.content);
+	 	}
+	 });
+</script>
+</html>
